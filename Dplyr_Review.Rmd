@@ -1,0 +1,188 @@
+---
+title: "Dplyr Basics- R for Data Science"
+author: "Katie Ireland"
+date: "2024-09-03"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## Dplyr Basics
+
+### Overview
+[Dplyr](https://dplyr.tidyverse.org/) is a powerful R package within the [tidyverse](https://www.tidyverse.org/), essential for data manipulation. This workshop will help you review `dplyr` verbs that are useful in research and assisting students.
+
+#### How do we specify the function from a specific package?
+- Syntax: `packagename::functionname()`
+
+#### What is the difference between a tibble and a data frame?
+- **Answer**: Tibbles are designed for large datasets and print only the first few rows and columns that fit on one screen.
+
+### Getting Started with Dplyr
+Let's use the `flights` dataset from [Wickham's R for Data Science](https://r4ds.had.co.nz/). This dataset contains all 336,776 flights that departed from NYC in 2013.
+
+```
+install.packages("nycflights13")
+library(tidyverse)
+library(nycflights13)
+summary(flights)
+View(flights)
+```
+
+### Dplyr Verbs Overview
+
+```
+flights |>
+  filter(dest == "IAH") |> 
+  group_by(year, month, day) |> 
+  summarize(arr_delay = mean(arr_delay, na.rm = TRUE))
+```
+
+#### Dplyr Verbs are organized into four groups:
+1. **Rows**
+2. **Columns**
+3. **Groups**
+4. **Tables**
+
+Note that dplyr verbs can be combined using the powerful pipe operator %>% or |> !!     
+The shortcut for the pipe is:
+- Mac users: shift + command + m
+- windows users: ctrl + shift + m
+---
+
+## Verbs for Rows
+
+### 1. Filter Rows
+- `filter()`: Select rows based on conditions without changing their order.
+- Find all flights that departed more than four hours late.
+
+```
+flights |> filter(dep_delay > 240)
+```
+Note: filter can be used with combinations of conditions (i.e. Booleans)    
+Like == (equal to) != (not equal to)
+Common mistakes with filter:    
+- using = instead of ==
+- any others you can think of?        
+### 2. Arrange Rows
+- `arrange()`: Adjust the order of rows without changing their content.
+
+```
+flights |> arrange(desc(dep_delay))
+```
+
+### 3. Unique Rows
+- `distinct()`: Find unique rows based on specified columns.
+
+```
+flights |> distinct(origin, dest)
+```
+### 4. Slice Rows
+- `slice()`: Select rows by position
+
+```
+flights |> slice(1:5)
+flights |> slice(seq(1,n(), by=100))
+```
+
+### Exercises:
+1. **Find flights where `arr_delay` is missing but `dep_delay` is not.**
+
+```
+flights |> filter(is.na(arr_delay) & !is.na(dep_delay))
+```
+
+2. **How many flights have a missing `dep_time`?**
+
+```
+flights |> filter(is.na(dep_time)) |> count()
+```
+
+3. **What might these rows represent?**
+- Likely flights that were canceled or diverted.
+
+---
+
+## Verbs for Columns
+
+### 1. Select Columns
+- `select()`: Choose specific columns.
+- Select only the columns related to the origin and destination of flights.
+
+```
+flights |> select(origin, dest) |> distinct()
+```
+
+### 2. Rename Columns
+- `rename()`: Change column names.
+
+```
+flights |> rename(dist = distance)
+```
+
+### 3. Create New Columns
+- `mutate()`: Add or modify columns.
+- Create a column showing the difference between scheduled and actual departure times.
+
+```
+flights |> mutate(dep_diff = dep_time - sched_dep_time)
+```
+
+---
+
+## Verbs for Groups
+
+### 1. Summarize Data by Groups
+- `group_by()` and `summarize()`: Group data and generate summary statistics.
+- Calculate the average delay by carrier.
+
+```
+flights |> group_by(carrier) |> summarize(avg_delay = mean(dep_delay, na.rm = TRUE))
+```
+
+---
+
+## Additional Exercises
+
+1. **Find the fastest flights to Atlanta.**
+
+```
+flights |> filter(dest == "ATL") |> mutate(speed = distance / air_time * 60) |> arrange(desc(speed))
+```
+
+2. **Find flights that flew on January 3rd, departed from JFK, and were operated by American Airlines.**
+
+
+
+3. **Calculate the percentage of flights that arrived on time or early at JFK.**
+
+
+
+
+
+## More fun with filter(), mutate(), and more
+
+1. **Dataset Overview: Personal Expenditure 
+This dataset includes annual personal expenditures on various categories across five U.S States.**
+
+```
+data("USPersonalExpenditure")
+
+```
+2. **Explore the data: what year(s) and categories are included?**
+
+```
+personal_exp <- as.data.frame(USPersonalExpenditure)
+
+head(personal_exp)
+
+```
+3. Next, compute the total expenditure for each category in 1940.
+4. Filter data where the 1945 expenditure is above 300, create a new column showing the ratio of 1940-1945 expenditure, and calculate the average ratio. 
+5. Group by category, create a column for the percentage change, and summarize the total percentage change across all categories. 
+
+
+Next, using a dataset either from R or your own, write a script that includes: filter, summarize, and mutate to generate information
+about the dataset. We will then take turns showing off our output!
+
+Recommended datasets: [iris](https://gist.github.com/curran/a08a1080b88344b0c8a7), [starwars](https://github.com/tidyverse/dplyr/blob/main/data-raw/starwars.csv), and [other r datasets](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html)
