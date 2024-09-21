@@ -177,7 +177,7 @@ personal_exp <- as.data.frame(USPersonalExpenditure)
 head(personal_exp)
 
 ```
-3. Next, compute the total expenditure for each category in 1940.
+3. Next, compute and compare the total expenditure in 1940 vs. 1960.
 4. Filter data where the 1945 expenditure is above 300, create a new column showing the ratio of 1940-1945 expenditure, and calculate the average ratio. 
 5. Group by category, create a column for the percentage change, and summarize the total percentage change across all categories. 
 
